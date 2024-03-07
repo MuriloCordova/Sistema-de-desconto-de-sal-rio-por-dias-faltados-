@@ -2,23 +2,22 @@ package com.senai.pagamento.controllers;
 
 import com.senai.pagamento.dtos.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/Desconto")
-public class DescontoController {
+@RequestMapping("/Pagamento")
+public class PagamentoController {
 
-    @PostMapping("/Total")
-    public ResponseEntity<RetornoDTO> totalSalario(@RequestBody DescontoDTO dados) {
+    @PostMapping("/Desconto")
+    public ResponseEntity<RetornoDTO> descontoSalario(@RequestBody PagamentoDTO dados) {
 
         RetornoDTO resultado = new RetornoDTO();
 
         /*  • Se o usuário faltar 1(um) dia, descontar R$100.
             • Se o usuário faltar mais de 1 (um) dia, descontar R$110 e R$50
-                a cada dia. Ex: Faltou 5 dias, salário 2000. Descontar R$110 e mais R$250 por
-                5 dias faltados, totalizando R$360 de desconto.
+            a cada dia. Ex: Faltou 5 dias, salário 2000. Descontar R$110 e mais R$250 por
+            5 dias faltados, totalizando R$360 de desconto.
          */
 
         int faltouUmDia = 1;
@@ -50,5 +49,25 @@ public class DescontoController {
         }
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(resultado);
     }
+    @PostMapping("/Horaextra")
+    public ResponseEntity<RetornoDTO> horaExtra(@RequestBody PagamentoDTO dados){
+        RetornoDTO resultado = new RetornoDTO();
 
+        resultado.setDescontoSalario(dados.getHoraExtra() * dados.getValorHora() + dados.getSalario());
+        resultado.setNomeUsuario(dados.getNomeUsuario());
+        resultado.setSalario(dados.getSalario());
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(resultado);
+    }
+
+    @PostMapping("/abono")
+    public ResponseEntity<RetornoDTO> abono(@RequestBody PagamentoDTO dados){
+        RetornoDTO resultado = new RetornoDTO();
+
+        resultado.setDescontoSalario(dados.getDiasAbonados() * dados.getValorAbono() - dados.getSalario());
+        resultado.setNomeUsuario(dados.getNomeUsuario());
+        resultado.setSalario(dados.getSalario());
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(resultado);
+    }
 }
